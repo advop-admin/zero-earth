@@ -3,17 +3,19 @@ import { useRef, useEffect, useCallback, useMemo, useState } from "react";
 import { gsap } from "gsap";
 
 const LogoLattice = ({
-  logoSize = 60,
-  gap = 20,
+  logoSize = 40,
+  gap = 60,
   baseOpacity = 0.2,
   hoverOpacity = 1,
   transitionDuration = 0.3,
+  bondOpacity = 0.3,
   className = "",
   style,
 }) => {
   const wrapperRef = useRef(null);
   const canvasRef = useRef(null);
-  const logosRef = useRef([]);
+  const nodesRef = useRef([]);
+  const bondsRef = useRef([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
@@ -56,7 +58,8 @@ const LogoLattice = ({
     return img;
   }, []);
 
-  const buildLattice = useCallback(() => {
+  // Create covalent bond-like lattice structure
+  const buildCovalentLattice = useCallback(() => {
     const wrap = wrapperRef.current;
     const canvas = canvasRef.current;
     if (!wrap || !canvas || !isLoaded) return;
@@ -71,36 +74,74 @@ const LogoLattice = ({
     const ctx = canvas.getContext("2d");
     if (ctx) ctx.scale(dpr, dpr);
 
-    // Calculate grid for triangular tessellation
-    const cellSize = logoSize + gap;
+    // Create hexagonal grid for covalent bond structure
+    const cellSize = gap;
     const cols = Math.ceil((width + cellSize) / cellSize);
     const rows = Math.ceil((height + cellSize) / cellSize);
 
-    const logos = [];
+    const nodes = [];
+    const bonds = [];
     
-    // Create tessellated pattern with offset rows for triangular effect
+    // Create nodes in hexagonal pattern
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const x = col * cellSize + (row % 2) * (cellSize / 2);
-        const y = row * cellSize * 0.866; // 0.866 = sin(60°)
+        const y = row * cellSize * 0.866; // sin(60°)
         
-        // Only add if within bounds with some padding
+        // Only add if within bounds
         if (x >= -logoSize && x <= width + logoSize && y >= -logoSize && y <= height + logoSize) {
-          logos.push({
+          const node = {
+            id: `${row}-${col}`,
             x,
             y,
             isHovered: false,
             opacity: baseOpacity,
-            rotation: Math.random() * 360, // Random rotation for variety
-            scale: 0.8 + Math.random() * 0.4, // Random scale for variety
-          });
+            rotation: Math.random() * 360,
+            scale: 0.8 + Math.random() * 0.4,
+            connections: []
+          };
+          nodes.push(node);
         }
       }
     }
 
-    logosRef.current = logos;
+    // Create covalent bonds between adjacent nodes
+    nodes.forEach((node, index) => {
+      const [row, col] = node.id.split('-').map(Number);
+      
+      // Find adjacent nodes (6 directions in hexagonal grid)
+      const directions = [
+        [-1, -1], [-1, 0], [-1, 1],
+        [0, -1],           [0, 1],
+        [1, -1],  [1, 0],  [1, 1]
+      ];
+
+      directions.forEach(([dr, dc]) => {
+        const targetId = `${row + dr}-${col + dc}`;
+        const targetNode = nodes.find(n => n.id === targetId);
+        
+        if (targetNode && !bonds.some(b => 
+          (b.from === node.id && b.to === targetId) || 
+          (b.from === targetId && b.to === node.id)
+        )) {
+          const bond = {
+            from: node.id,
+            to: targetId,
+            fromNode: node,
+            toNode: targetNode,
+            opacity: bondOpacity,
+            isActive: false
+          };
+          bonds.push(bond);
+          node.connections.push(bond);
+        }
+      });
+    });
+
+    nodesRef.current = nodes;
+    bondsRef.current = bonds;
     renderLattice();
-  }, [logoSize, gap, baseOpacity, isLoaded]);
+  }, [logoSize, gap, baseOpacity, bondOpacity, isLoaded]);
 
   const renderLattice = useCallback(() => {
     const canvas = canvasRef.current;
@@ -114,20 +155,17 @@ const LogoLattice = ({
 
     // Draw background image if loaded
     if (backgroundLoaded && backgroundImage) {
-      // Calculate aspect ratio to fit background
       const imgAspect = backgroundImage.width / backgroundImage.height;
       const canvasAspect = width / height;
       
       let drawWidth, drawHeight, drawX, drawY;
       
       if (imgAspect > canvasAspect) {
-        // Image is wider than canvas
         drawHeight = height;
         drawWidth = height * imgAspect;
         drawX = (width - drawWidth) / 2;
         drawY = 0;
       } else {
-        // Image is taller than canvas
         drawWidth = width;
         drawHeight = width / imgAspect;
         drawX = 0;
@@ -141,15 +179,33 @@ const LogoLattice = ({
       ctx.fillRect(0, 0, width, height);
     }
 
-    // Draw logos
-    logosRef.current.forEach((logo) => {
-      ctx.save();
-      ctx.globalAlpha = logo.opacity;
-      ctx.translate(logo.x + logoSize / 2, logo.y + logoSize / 2);
-      ctx.rotate((logo.rotation * Math.PI) / 180);
-      ctx.scale(logo.scale, logo.scale);
+    // Draw covalent bonds first (behind logos)
+    bondsRef.current.forEach((bond) => {
+      const fromNode = bond.fromNode;
+      const toNode = bond.toNode;
       
-      const img = logo.isHovered ? coloredLogo : monochromeLogo;
+      if (fromNode && toNode) {
+        ctx.save();
+        ctx.globalAlpha = bond.opacity;
+        ctx.strokeStyle = fromNode.isHovered || toNode.isHovered ? '#ffffff' : '#666666';
+        ctx.lineWidth = fromNode.isHovered || toNode.isHovered ? 2 : 1;
+        ctx.beginPath();
+        ctx.moveTo(fromNode.x + logoSize / 2, fromNode.y + logoSize / 2);
+        ctx.lineTo(toNode.x + logoSize / 2, toNode.y + logoSize / 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    });
+
+    // Draw logos on top
+    nodesRef.current.forEach((node) => {
+      ctx.save();
+      ctx.globalAlpha = node.opacity;
+      ctx.translate(node.x + logoSize / 2, node.y + logoSize / 2);
+      ctx.rotate((node.rotation * Math.PI) / 180);
+      ctx.scale(node.scale, node.scale);
+      
+      const img = node.isHovered ? coloredLogo : monochromeLogo;
       ctx.drawImage(img, -logoSize / 2, -logoSize / 2, logoSize, logoSize);
       
       ctx.restore();
@@ -162,55 +218,96 @@ const LogoLattice = ({
 
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    const hoverRadius = logoSize * 2;
+    const hoverRadius = logoSize * 1.5;
 
-    logosRef.current.forEach((logo) => {
+    let hasChanges = false;
+
+    nodesRef.current.forEach((node) => {
       const distance = Math.sqrt(
-        Math.pow(mouseX - (logo.x + logoSize / 2), 2) +
-        Math.pow(mouseY - (logo.y + logoSize / 2), 2)
+        Math.pow(mouseX - (node.x + logoSize / 2), 2) +
+        Math.pow(mouseY - (node.y + logoSize / 2), 2)
       );
 
-      const wasHovered = logo.isHovered;
-      logo.isHovered = distance < hoverRadius;
+      const wasHovered = node.isHovered;
+      node.isHovered = distance < hoverRadius;
 
-      if (logo.isHovered !== wasHovered) {
-        gsap.to(logo, {
-          opacity: logo.isHovered ? hoverOpacity : baseOpacity,
-          scale: logo.isHovered ? 1.1 : (0.8 + Math.random() * 0.4),
+      if (node.isHovered !== wasHovered) {
+        hasChanges = true;
+        gsap.to(node, {
+          opacity: node.isHovered ? hoverOpacity : baseOpacity,
+          scale: node.isHovered ? 1.2 : (0.8 + Math.random() * 0.4),
           duration: transitionDuration,
           ease: "power2.out",
-          onUpdate: renderLattice,
         });
       }
     });
-  }, [logoSize, hoverOpacity, baseOpacity, transitionDuration]);
+
+    // Update bond opacity based on connected nodes
+    bondsRef.current.forEach((bond) => {
+      const fromNode = bond.fromNode;
+      const toNode = bond.toNode;
+      const shouldBeActive = fromNode?.isHovered || toNode?.isHovered;
+      
+      if (bond.isActive !== shouldBeActive) {
+        bond.isActive = shouldBeActive;
+        hasChanges = true;
+        gsap.to(bond, {
+          opacity: shouldBeActive ? 0.8 : bondOpacity,
+          duration: transitionDuration,
+          ease: "power2.out",
+        });
+      }
+    });
+
+    if (hasChanges) {
+      renderLattice();
+    }
+  }, [logoSize, hoverOpacity, baseOpacity, bondOpacity, transitionDuration]);
 
   const handleMouseLeave = useCallback(() => {
-    logosRef.current.forEach((logo) => {
-      if (logo.isHovered) {
-        logo.isHovered = false;
-        gsap.to(logo, {
+    let hasChanges = false;
+
+    nodesRef.current.forEach((node) => {
+      if (node.isHovered) {
+        node.isHovered = false;
+        hasChanges = true;
+        gsap.to(node, {
           opacity: baseOpacity,
           scale: 0.8 + Math.random() * 0.4,
           duration: transitionDuration,
           ease: "power2.out",
-          onUpdate: renderLattice,
         });
       }
     });
-  }, [baseOpacity, transitionDuration]);
+
+    bondsRef.current.forEach((bond) => {
+      if (bond.isActive) {
+        bond.isActive = false;
+        hasChanges = true;
+        gsap.to(bond, {
+          opacity: bondOpacity,
+          duration: transitionDuration,
+          ease: "power2.out",
+        });
+      }
+    });
+
+    if (hasChanges) {
+      renderLattice();
+    }
+  }, [baseOpacity, bondOpacity, transitionDuration]);
 
   // Initialize and handle resize
   useEffect(() => {
-    buildLattice();
+    buildCovalentLattice();
     
     const handleResize = () => {
-      buildLattice();
+      buildCovalentLattice();
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [buildLattice]);
+  }, [buildCovalentLattice]);
 
   // Re-render when images load
   useEffect(() => {
@@ -236,7 +333,7 @@ const LogoLattice = ({
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
-            <p>Loading assets...</p>
+            <p>Loading covalent lattice...</p>
           </div>
         </div>
       )}
