@@ -1,7 +1,6 @@
 'use client';
 import { useRef, useEffect, useCallback, useMemo, useState } from "react";
 import { gsap } from "gsap";
-import Image from "next/image";
 
 const LogoLattice = ({
   logoSize = 60,
@@ -21,24 +20,39 @@ const LogoLattice = ({
   // Load images
   const coloredLogo = useMemo(() => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
     img.src = '/assets/logos/logo-colored.png';
-    img.onload = () => setIsLoaded(true);
+    img.onload = () => {
+      console.log('Colored logo loaded');
+      setIsLoaded(true);
+    };
+    img.onerror = (e) => {
+      console.error('Error loading colored logo:', e);
+    };
     return img;
   }, []);
 
   const monochromeLogo = useMemo(() => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
     img.src = '/assets/logos/logo-monochrome.png';
+    img.onload = () => {
+      console.log('Monochrome logo loaded');
+    };
+    img.onerror = (e) => {
+      console.error('Error loading monochrome logo:', e);
+    };
     return img;
   }, []);
 
   const backgroundImage = useMemo(() => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
     img.src = '/assets/images/farmer-background.jpg';
-    img.onload = () => setBackgroundLoaded(true);
+    img.onload = () => {
+      console.log('Background image loaded');
+      setBackgroundLoaded(true);
+    };
+    img.onerror = (e) => {
+      console.error('Error loading background image:', e);
+    };
     return img;
   }, []);
 
