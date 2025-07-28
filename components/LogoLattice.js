@@ -2,6 +2,18 @@
 import { useRef, useEffect, useCallback, useMemo, useState } from "react";
 import { gsap } from "gsap";
 
+// Throttle function for performance optimization
+const throttle = (func, limit) => {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+};
+
 const LogoLattice = ({
   logoSize = 40,
   gap = 60,
@@ -16,47 +28,63 @@ const LogoLattice = ({
   const canvasRef = useRef(null);
   const nodesRef = useRef([]);
   const bondsRef = useRef([]);
+  const animationRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
-  // Load images
-  const coloredLogo = useMemo(() => {
+  // Detect touch device
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
+
+  // Load images with proper error handling
+  const loadImage = useCallback((src, onLoad, onError) => {
     const img = new Image();
-    img.src = '/assets/logos/logo-colored.png';
-    img.onload = () => {
-      console.log('Colored logo loaded');
-      setIsLoaded(true);
-    };
-    img.onerror = (e) => {
-      console.error('Error loading colored logo:', e);
-    };
+    img.crossOrigin = 'anonymous';
+    img.onload = onLoad;
+    img.onerror = onError;
+    img.src = src;
     return img;
   }, []);
+
+  const coloredLogo = useMemo(() => {
+    return loadImage(
+      '/assets/logos/logo-colored.png',
+      () => {
+        console.log('Colored logo loaded');
+        setIsLoaded(true);
+      },
+      (e) => {
+        console.error('Error loading colored logo:', e);
+        // Fallback to monochrome if colored fails
+        setIsLoaded(true);
+      }
+    );
+  }, [loadImage]);
 
   const monochromeLogo = useMemo(() => {
-    const img = new Image();
-    img.src = '/assets/logos/logo-monochrome.png';
-    img.onload = () => {
-      console.log('Monochrome logo loaded');
-    };
-    img.onerror = (e) => {
-      console.error('Error loading monochrome logo:', e);
-    };
-    return img;
-  }, []);
+    return loadImage(
+      '/assets/logos/logo-monochrome.png',
+      () => console.log('Monochrome logo loaded'),
+      (e) => console.error('Error loading monochrome logo:', e)
+    );
+  }, [loadImage]);
 
   const backgroundImage = useMemo(() => {
-    const img = new Image();
-    img.src = '/assets/images/farmer-background.jpg';
-    img.onload = () => {
-      console.log('Background image loaded');
-      setBackgroundLoaded(true);
-    };
-    img.onerror = (e) => {
-      console.error('Error loading background image:', e);
-    };
-    return img;
-  }, []);
+    return loadImage(
+      '/assets/images/farmer-background.jpg',
+      () => {
+        console.log('Background image loaded');
+        setBackgroundLoaded(true);
+      },
+      (e) => {
+        console.error('Error loading background image:', e);
+        // Continue without background
+        setBackgroundLoaded(true);
+      }
+    );
+  }, [loadImage]);
 
   // Create covalent bond-like lattice structure
   const buildCovalentLattice = useCallback(() => {
@@ -106,7 +134,7 @@ const LogoLattice = ({
     }
 
     // Create covalent bonds between adjacent nodes
-    nodes.forEach((node, index) => {
+    nodes.forEach((node) => {
       const [row, col] = node.id.split('-').map(Number);
       
       // Find adjacent nodes (6 directions in hexagonal grid)
@@ -212,20 +240,21 @@ const LogoLattice = ({
     });
   }, [logoSize, baseOpacity, isLoaded, backgroundLoaded, backgroundImage, coloredLogo, monochromeLogo]);
 
-  const handleMouseMove = useCallback((e) => {
+  // Unified interaction handler for both mouse and touch
+  const handleInteraction = useCallback((clientX, clientY) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
     const hoverRadius = logoSize * 1.5;
 
     let hasChanges = false;
 
     nodesRef.current.forEach((node) => {
       const distance = Math.sqrt(
-        Math.pow(mouseX - (node.x + logoSize / 2), 2) +
-        Math.pow(mouseY - (node.y + logoSize / 2), 2)
+        Math.pow(x - (node.x + logoSize / 2), 2) +
+        Math.pow(y - (node.y + logoSize / 2), 2)
       );
 
       const wasHovered = node.isHovered;
@@ -233,12 +262,23 @@ const LogoLattice = ({
 
       if (node.isHovered !== wasHovered) {
         hasChanges = true;
-        gsap.to(node, {
+        
+        // Kill any existing animation for this node
+        if (animationRef.current && animationRef.current[node.id]) {
+          animationRef.current[node.id].kill();
+        }
+        
+        // Create new animation
+        const anim = gsap.to(node, {
           opacity: node.isHovered ? hoverOpacity : baseOpacity,
           scale: node.isHovered ? 1.2 : (0.8 + Math.random() * 0.4),
           duration: transitionDuration,
           ease: "power2.out",
         });
+        
+        // Store animation reference
+        if (!animationRef.current) animationRef.current = {};
+        animationRef.current[node.id] = anim;
       }
     });
 
@@ -251,6 +291,7 @@ const LogoLattice = ({
       if (bond.isActive !== shouldBeActive) {
         bond.isActive = shouldBeActive;
         hasChanges = true;
+        
         gsap.to(bond, {
           opacity: shouldBeActive ? 0.8 : bondOpacity,
           duration: transitionDuration,
@@ -264,19 +305,39 @@ const LogoLattice = ({
     }
   }, [logoSize, hoverOpacity, baseOpacity, bondOpacity, transitionDuration]);
 
-  const handleMouseLeave = useCallback(() => {
-    let hasChanges = false;
+  // Throttled interaction handler
+  const throttledInteraction = useMemo(() => 
+    throttle(handleInteraction, 16), // ~60fps
+    [handleInteraction]
+  );
 
+  // Mouse event handlers
+  const handleMouseMove = useCallback((e) => {
+    throttledInteraction(e.clientX, e.clientY);
+  }, [throttledInteraction]);
+
+  const handleMouseLeave = useCallback(() => {
+    // Reset all nodes
+    let hasChanges = false;
+    
     nodesRef.current.forEach((node) => {
       if (node.isHovered) {
         node.isHovered = false;
         hasChanges = true;
-        gsap.to(node, {
+        
+        if (animationRef.current && animationRef.current[node.id]) {
+          animationRef.current[node.id].kill();
+        }
+        
+        const anim = gsap.to(node, {
           opacity: baseOpacity,
           scale: 0.8 + Math.random() * 0.4,
           duration: transitionDuration,
           ease: "power2.out",
         });
+        
+        if (!animationRef.current) animationRef.current = {};
+        animationRef.current[node.id] = anim;
       }
     });
 
@@ -297,6 +358,35 @@ const LogoLattice = ({
     }
   }, [baseOpacity, bondOpacity, transitionDuration]);
 
+  // --- Native touch event listeners for passive: false ---
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    function onTouchStart(e) {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        throttledInteraction(touch.clientX, touch.clientY);
+      }
+    }
+    function onTouchMove(e) {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        throttledInteraction(touch.clientX, touch.clientY);
+      }
+    }
+    function onTouchEnd(e) {
+      handleMouseLeave();
+    }
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+    return () => {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [throttledInteraction, handleMouseLeave]);
+
   // Initialize and handle resize
   useEffect(() => {
     buildCovalentLattice();
@@ -306,7 +396,13 @@ const LogoLattice = ({
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      // Cleanup animations
+      if (animationRef.current) {
+        Object.values(animationRef.current).forEach(anim => anim.kill());
+      }
+    };
   }, [buildCovalentLattice]);
 
   // Re-render when images load
@@ -324,10 +420,13 @@ const LogoLattice = ({
     >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-0 w-full h-full touch-none"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        style={{ cursor: 'pointer' }}
+        style={{ 
+          cursor: isTouchDevice ? 'default' : 'pointer',
+          touchAction: 'none'
+        }}
       />
       {(!isLoaded || !backgroundLoaded) && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white">
