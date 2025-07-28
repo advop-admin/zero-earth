@@ -167,7 +167,7 @@ const LogoLattice = ({
       ctx.drawImage(backgroundImage, drawX, drawY, drawWidth, drawHeight);
       
       // Add subtle overlay for better contrast
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
       ctx.fillRect(0, 0, width, height);
     }
 
@@ -218,7 +218,6 @@ const LogoLattice = ({
 
       if (node.isHovered !== wasHovered) {
         hasChanges = true;
-        console.log(`Node ${node.id} hover state changed: ${wasHovered} -> ${node.isHovered}`);
         
         // Kill any existing animation for this node
         if (animationRef.current && animationRef.current[node.id]) {
@@ -243,7 +242,6 @@ const LogoLattice = ({
     });
 
     if (hasChanges) {
-      console.log(`Hover interaction: ${hoveredCount} nodes hovered`);
       renderLattice();
     }
   }, [logoSize, hoverOpacity, baseOpacity, transitionDuration, renderLattice]);
@@ -256,12 +254,10 @@ const LogoLattice = ({
 
   // Mouse event handlers
   const handleMouseMove = useCallback((e) => {
-    console.log('Mouse move detected:', e.clientX, e.clientY);
     throttledInteraction(e.clientX, e.clientY);
   }, [throttledInteraction]);
 
   const handleMouseLeave = useCallback(() => {
-    console.log('Mouse leave detected');
     // Reset all nodes
     let hasChanges = false;
     
@@ -294,13 +290,12 @@ const LogoLattice = ({
     }
   }, [baseOpacity, transitionDuration, renderLattice]);
 
-  // --- Native touch event listeners for passive: false ---
+  // Touch event handlers
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
     function onTouchStart(e) {
-      console.log('Touch start detected');
       if (e.touches.length > 0) {
         const touch = e.touches[0];
         throttledInteraction(touch.clientX, touch.clientY);
@@ -315,7 +310,6 @@ const LogoLattice = ({
     }
     
     function onTouchEnd(e) {
-      console.log('Touch end detected');
       handleMouseLeave();
     }
     
@@ -384,4 +378,4 @@ const LogoLattice = ({
   );
 };
 
-export default LogoLattice; 
+export default LogoLattice;
