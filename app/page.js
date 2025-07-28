@@ -19,7 +19,7 @@ export default function Home() {
       <div className="w-full h-screen relative">
         <LogoLattice
           logoSize={35}
-          gap={80}
+          gap={100}
           baseOpacity={0.25}
           hoverOpacity={1}
           transitionDuration={0.4}

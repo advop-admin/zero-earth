@@ -250,6 +250,7 @@ const LogoLattice = ({
     const hoverRadius = logoSize * 1.5;
 
     let hasChanges = false;
+    let hoveredCount = 0;
 
     nodesRef.current.forEach((node) => {
       const distance = Math.sqrt(
@@ -260,20 +261,27 @@ const LogoLattice = ({
       const wasHovered = node.isHovered;
       node.isHovered = distance < hoverRadius;
 
+      if (node.isHovered) hoveredCount++;
+
       if (node.isHovered !== wasHovered) {
         hasChanges = true;
+        console.log(`Node ${node.id} hover state changed: ${wasHovered} -> ${node.isHovered}`);
         
         // Kill any existing animation for this node
         if (animationRef.current && animationRef.current[node.id]) {
           animationRef.current[node.id].kill();
         }
         
-        // Create new animation
+        // Create new animation with onUpdate callback
         const anim = gsap.to(node, {
           opacity: node.isHovered ? hoverOpacity : baseOpacity,
           scale: node.isHovered ? 1.2 : (0.8 + Math.random() * 0.4),
           duration: transitionDuration,
           ease: "power2.out",
+          onUpdate: () => {
+            // Force re-render when animation updates
+            renderLattice();
+          }
         });
         
         // Store animation reference
@@ -296,14 +304,18 @@ const LogoLattice = ({
           opacity: shouldBeActive ? 0.8 : bondOpacity,
           duration: transitionDuration,
           ease: "power2.out",
+          onUpdate: () => {
+            renderLattice();
+          }
         });
       }
     });
 
     if (hasChanges) {
+      console.log(`Hover interaction: ${hoveredCount} nodes hovered`);
       renderLattice();
     }
-  }, [logoSize, hoverOpacity, baseOpacity, bondOpacity, transitionDuration]);
+  }, [logoSize, hoverOpacity, baseOpacity, bondOpacity, transitionDuration, renderLattice]);
 
   // Throttled interaction handler
   const throttledInteraction = useMemo(() => 
@@ -313,10 +325,12 @@ const LogoLattice = ({
 
   // Mouse event handlers
   const handleMouseMove = useCallback((e) => {
+    console.log('Mouse move detected:', e.clientX, e.clientY);
     throttledInteraction(e.clientX, e.clientY);
   }, [throttledInteraction]);
 
   const handleMouseLeave = useCallback(() => {
+    console.log('Mouse leave detected');
     // Reset all nodes
     let hasChanges = false;
     
@@ -334,6 +348,9 @@ const LogoLattice = ({
           scale: 0.8 + Math.random() * 0.4,
           duration: transitionDuration,
           ease: "power2.out",
+          onUpdate: () => {
+            renderLattice();
+          }
         });
         
         if (!animationRef.current) animationRef.current = {};
@@ -349,6 +366,9 @@ const LogoLattice = ({
           opacity: bondOpacity,
           duration: transitionDuration,
           ease: "power2.out",
+          onUpdate: () => {
+            renderLattice();
+          }
         });
       }
     });
@@ -356,30 +376,37 @@ const LogoLattice = ({
     if (hasChanges) {
       renderLattice();
     }
-  }, [baseOpacity, bondOpacity, transitionDuration]);
+  }, [baseOpacity, bondOpacity, transitionDuration, renderLattice]);
 
   // --- Native touch event listeners for passive: false ---
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    
     function onTouchStart(e) {
+      console.log('Touch start detected');
       if (e.touches.length > 0) {
         const touch = e.touches[0];
         throttledInteraction(touch.clientX, touch.clientY);
       }
     }
+    
     function onTouchMove(e) {
       if (e.touches.length > 0) {
         const touch = e.touches[0];
         throttledInteraction(touch.clientX, touch.clientY);
       }
     }
+    
     function onTouchEnd(e) {
+      console.log('Touch end detected');
       handleMouseLeave();
     }
+    
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+    
     return () => {
       canvas.removeEventListener('touchstart', onTouchStart);
       canvas.removeEventListener('touchmove', onTouchMove);
@@ -408,6 +435,7 @@ const LogoLattice = ({
   // Re-render when images load
   useEffect(() => {
     if (isLoaded && backgroundLoaded) {
+      console.log('All assets loaded, rendering lattice');
       renderLattice();
     }
   }, [isLoaded, backgroundLoaded, renderLattice]);
