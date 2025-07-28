@@ -15,19 +15,16 @@ const throttle = (func, limit) => {
 };
 
 const LogoLattice = ({
-  logoSize = 40,
-  gap = 60,
+  logoSize = 50,
   baseOpacity = 0.2,
-  hoverOpacity = 1,
+  hoverOpacity = 0.8,
   transitionDuration = 0.3,
-  bondOpacity = 0.3,
   className = "",
   style,
 }) => {
   const wrapperRef = useRef(null);
   const canvasRef = useRef(null);
   const nodesRef = useRef([]);
-  const bondsRef = useRef([]);
   const animationRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
@@ -57,7 +54,6 @@ const LogoLattice = ({
       },
       (e) => {
         console.error('Error loading colored logo:', e);
-        // Fallback to monochrome if colored fails
         setIsLoaded(true);
       }
     );
@@ -80,14 +76,13 @@ const LogoLattice = ({
       },
       (e) => {
         console.error('Error loading background image:', e);
-        // Continue without background
         setBackgroundLoaded(true);
       }
     );
   }, [loadImage]);
 
-  // Create covalent bond-like lattice structure
-  const buildCovalentLattice = useCallback(() => {
+  // Create tessellating hexagonal lattice structure
+  const buildTessellatingLattice = useCallback(() => {
     const wrap = wrapperRef.current;
     const canvas = canvasRef.current;
     if (!wrap || !canvas || !isLoaded) return;
@@ -102,21 +97,25 @@ const LogoLattice = ({
     const ctx = canvas.getContext("2d");
     if (ctx) ctx.scale(dpr, dpr);
 
-    // Create hexagonal grid for covalent bond structure
-    const cellSize = gap;
-    const cols = Math.ceil((width + cellSize) / cellSize);
-    const rows = Math.ceil((height + cellSize) / cellSize);
+    // Calculate hexagonal grid spacing
+    const hexSize = logoSize * 1.2; // Space between logo centers
+    const hexWidth = hexSize * Math.sqrt(3);
+    const hexHeight = hexSize * 2;
+
+    // Calculate grid dimensions with extra padding
+    const cols = Math.ceil((width + hexWidth) / hexWidth) + 2;
+    const rows = Math.ceil((height + hexHeight) / hexHeight) + 2;
 
     const nodes = [];
-    const bonds = [];
     
-    // Create nodes in hexagonal pattern
+    // Create hexagonal grid of logo nodes
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
-        const x = col * cellSize + (row % 2) * (cellSize / 2);
-        const y = row * cellSize * 0.866; // sin(60°)
+        // Calculate hexagonal position
+        const x = col * hexWidth + (row % 2) * (hexWidth / 2);
+        const y = row * hexHeight * 0.75;
         
-        // Only add if within bounds
+        // Only add if within bounds with some padding
         if (x >= -logoSize && x <= width + logoSize && y >= -logoSize && y <= height + logoSize) {
           const node = {
             id: `${row}-${col}`,
@@ -125,51 +124,16 @@ const LogoLattice = ({
             isHovered: false,
             opacity: baseOpacity,
             rotation: Math.random() * 360,
-            scale: 0.8 + Math.random() * 0.4,
-            connections: []
+            scale: 0.9 + Math.random() * 0.2,
           };
           nodes.push(node);
         }
       }
     }
 
-    // Create covalent bonds between adjacent nodes
-    nodes.forEach((node) => {
-      const [row, col] = node.id.split('-').map(Number);
-      
-      // Find adjacent nodes (6 directions in hexagonal grid)
-      const directions = [
-        [-1, -1], [-1, 0], [-1, 1],
-        [0, -1],           [0, 1],
-        [1, -1],  [1, 0],  [1, 1]
-      ];
-
-      directions.forEach(([dr, dc]) => {
-        const targetId = `${row + dr}-${col + dc}`;
-        const targetNode = nodes.find(n => n.id === targetId);
-        
-        if (targetNode && !bonds.some(b => 
-          (b.from === node.id && b.to === targetId) || 
-          (b.from === targetId && b.to === node.id)
-        )) {
-          const bond = {
-            from: node.id,
-            to: targetId,
-            fromNode: node,
-            toNode: targetNode,
-            opacity: bondOpacity,
-            isActive: false
-          };
-          bonds.push(bond);
-          node.connections.push(bond);
-        }
-      });
-    });
-
     nodesRef.current = nodes;
-    bondsRef.current = bonds;
     renderLattice();
-  }, [logoSize, gap, baseOpacity, bondOpacity, isLoaded]);
+  }, [logoSize, baseOpacity, isLoaded]);
 
   const renderLattice = useCallback(() => {
     const canvas = canvasRef.current;
@@ -203,42 +167,31 @@ const LogoLattice = ({
       ctx.drawImage(backgroundImage, drawX, drawY, drawWidth, drawHeight);
       
       // Add subtle overlay for better contrast
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
       ctx.fillRect(0, 0, width, height);
     }
 
-    // Draw covalent bonds first (behind logos)
-    bondsRef.current.forEach((bond) => {
-      const fromNode = bond.fromNode;
-      const toNode = bond.toNode;
-      
-      if (fromNode && toNode) {
-        ctx.save();
-        ctx.globalAlpha = bond.opacity;
-        ctx.strokeStyle = fromNode.isHovered || toNode.isHovered ? '#ffffff' : '#666666';
-        ctx.lineWidth = fromNode.isHovered || toNode.isHovered ? 2 : 1;
-        ctx.beginPath();
-        ctx.moveTo(fromNode.x + logoSize / 2, fromNode.y + logoSize / 2);
-        ctx.lineTo(toNode.x + logoSize / 2, toNode.y + logoSize / 2);
-        ctx.stroke();
-        ctx.restore();
-      }
-    });
-
-    // Draw logos on top
+    // Draw logo nodes only (no connecting lines)
     nodesRef.current.forEach((node) => {
       ctx.save();
+      
+      // Set global alpha for the logo
       ctx.globalAlpha = node.opacity;
+      
+      // Apply transformations
       ctx.translate(node.x + logoSize / 2, node.y + logoSize / 2);
       ctx.rotate((node.rotation * Math.PI) / 180);
       ctx.scale(node.scale, node.scale);
       
+      // Choose logo based on hover state
       const img = node.isHovered ? coloredLogo : monochromeLogo;
+      
+      // Draw the logo
       ctx.drawImage(img, -logoSize / 2, -logoSize / 2, logoSize, logoSize);
       
       ctx.restore();
     });
-  }, [logoSize, baseOpacity, isLoaded, backgroundLoaded, backgroundImage, coloredLogo, monochromeLogo]);
+  }, [logoSize, isLoaded, backgroundLoaded, backgroundImage, coloredLogo, monochromeLogo]);
 
   // Unified interaction handler for both mouse and touch
   const handleInteraction = useCallback((clientX, clientY) => {
@@ -247,7 +200,7 @@ const LogoLattice = ({
 
     const x = clientX - rect.left;
     const y = clientY - rect.top;
-    const hoverRadius = logoSize * 1.5;
+    const hoverRadius = logoSize * 0.8;
 
     let hasChanges = false;
     let hoveredCount = 0;
@@ -275,11 +228,10 @@ const LogoLattice = ({
         // Create new animation with onUpdate callback
         const anim = gsap.to(node, {
           opacity: node.isHovered ? hoverOpacity : baseOpacity,
-          scale: node.isHovered ? 1.2 : (0.8 + Math.random() * 0.4),
+          scale: node.isHovered ? 1.1 : (0.9 + Math.random() * 0.2),
           duration: transitionDuration,
           ease: "power2.out",
           onUpdate: () => {
-            // Force re-render when animation updates
             renderLattice();
           }
         });
@@ -290,32 +242,11 @@ const LogoLattice = ({
       }
     });
 
-    // Update bond opacity based on connected nodes
-    bondsRef.current.forEach((bond) => {
-      const fromNode = bond.fromNode;
-      const toNode = bond.toNode;
-      const shouldBeActive = fromNode?.isHovered || toNode?.isHovered;
-      
-      if (bond.isActive !== shouldBeActive) {
-        bond.isActive = shouldBeActive;
-        hasChanges = true;
-        
-        gsap.to(bond, {
-          opacity: shouldBeActive ? 0.8 : bondOpacity,
-          duration: transitionDuration,
-          ease: "power2.out",
-          onUpdate: () => {
-            renderLattice();
-          }
-        });
-      }
-    });
-
     if (hasChanges) {
       console.log(`Hover interaction: ${hoveredCount} nodes hovered`);
       renderLattice();
     }
-  }, [logoSize, hoverOpacity, baseOpacity, bondOpacity, transitionDuration, renderLattice]);
+  }, [logoSize, hoverOpacity, baseOpacity, transitionDuration, renderLattice]);
 
   // Throttled interaction handler
   const throttledInteraction = useMemo(() => 
@@ -345,7 +276,7 @@ const LogoLattice = ({
         
         const anim = gsap.to(node, {
           opacity: baseOpacity,
-          scale: 0.8 + Math.random() * 0.4,
+          scale: 0.9 + Math.random() * 0.2,
           duration: transitionDuration,
           ease: "power2.out",
           onUpdate: () => {
@@ -358,25 +289,10 @@ const LogoLattice = ({
       }
     });
 
-    bondsRef.current.forEach((bond) => {
-      if (bond.isActive) {
-        bond.isActive = false;
-        hasChanges = true;
-        gsap.to(bond, {
-          opacity: bondOpacity,
-          duration: transitionDuration,
-          ease: "power2.out",
-          onUpdate: () => {
-            renderLattice();
-          }
-        });
-      }
-    });
-
     if (hasChanges) {
       renderLattice();
     }
-  }, [baseOpacity, bondOpacity, transitionDuration, renderLattice]);
+  }, [baseOpacity, transitionDuration, renderLattice]);
 
   // --- Native touch event listeners for passive: false ---
   useEffect(() => {
@@ -416,10 +332,10 @@ const LogoLattice = ({
 
   // Initialize and handle resize
   useEffect(() => {
-    buildCovalentLattice();
+    buildTessellatingLattice();
     
     const handleResize = () => {
-      buildCovalentLattice();
+      buildTessellatingLattice();
     };
 
     window.addEventListener('resize', handleResize);
@@ -430,12 +346,12 @@ const LogoLattice = ({
         Object.values(animationRef.current).forEach(anim => anim.kill());
       }
     };
-  }, [buildCovalentLattice]);
+  }, [buildTessellatingLattice]);
 
   // Re-render when images load
   useEffect(() => {
     if (isLoaded && backgroundLoaded) {
-      console.log('All assets loaded, rendering lattice');
+      console.log('All assets loaded, rendering tessellating lattice');
       renderLattice();
     }
   }, [isLoaded, backgroundLoaded, renderLattice]);
@@ -460,7 +376,7 @@ const LogoLattice = ({
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
-            <p>Loading covalent lattice...</p>
+            <p>Loading tessellating lattice...</p>
           </div>
         </div>
       )}
