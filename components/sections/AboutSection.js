@@ -1,6 +1,6 @@
 const AboutSection = () => {
   return (
-    <section id="about" className="py-24 bg-gray-900">
+    <section id="about" className="py-24 bg-gray-900 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Text Content */}
@@ -70,7 +70,7 @@ const AboutSection = () => {
 
           {/* Visual Content */}
           <div className="relative">
-            <div className="bg-gradient-to-br from-green-600/20 to-green-400/10 rounded-2xl p-8 backdrop-blur-sm border border-green-400/20">
+            <div className="glass rounded-2xl p-8">
               <div className="space-y-6">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-green-400 mb-2">2019</div>

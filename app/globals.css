@@ -2,59 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom CSS Variables */
-:root {
-  --green-primary: #16a34a;
-  --green-secondary: #22c55e;
-  --blue-primary: #2563eb;
-  --purple-primary: #9333ea;
-  --red-primary: #dc2626;
-  --gradient-green: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
-  --gradient-blue: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-  --gradient-purple: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
+/* Base layer - fundamental styles */
+@layer base {
+  :root {
+    --green-primary: theme('colors.green.600');
+    --green-secondary: theme('colors.green.500');
+    --blue-primary: theme('colors.blue.600');
+    --purple-primary: theme('colors.purple.600');
+    --red-primary: theme('colors.red.600');
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply font-sans bg-black text-white overflow-x-hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded hover:bg-green-600 transition-colors;
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.gray.600') theme('colors.gray.800');
+  }
+
+  /* Text selection */
+  ::selection {
+    @apply bg-green-500/30 text-white;
+  }
+
+  ::-moz-selection {
+    @apply bg-green-500/30 text-white;
+  }
 }
 
-/* Base Styles */
-* {
-  box-sizing: border-box;
+/* Keyframes for animations */
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background-color: #000000;
-  color: #ffffff;
-  overflow-x: hidden;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #111827;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #16a34a;
-}
-
-/* Firefox scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #374151 #111827;
-}
-
-/* Custom Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
@@ -90,182 +94,203 @@ body {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* Utility Animation Classes */
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.animate-glow {
-  animation: glow 2s ease-in-out infinite;
-}
-
-.animate-slide-in-left {
-  animation: slideInFromLeft 0.6s ease-out forwards;
-}
-
-.animate-slide-in-right {
-  animation: slideInFromRight 0.6s ease-out forwards;
-}
-
-.animate-slide-in-bottom {
-  animation: slideInFromBottom 0.6s ease-out forwards;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.8s ease-out forwards;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.5s ease-out forwards;
-}
-
-/* Glass Morphism Effect */
-.glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.glass-dark {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Gradient Text */
-.gradient-text {
-  background: var(--gradient-green);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-blue {
-  background: var(--gradient-blue);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-purple {
-  background: var(--gradient-purple);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Custom Button Styles */
-.btn-glow {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-glow::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.btn-glow:hover::before {
-  left: 100%;
-}
-
-/* Loading States */
-.skeleton {
-  background: linear-gradient(90deg, #111827 25%, #1f2937 50%, #111827 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Interactive Elements */
-.interactive-card {
-  transition: all 0.3s ease;
-  transform-style: preserve-3d;
-}
-
-.interactive-card:hover {
-  transform: translateY(-5px) rotateX(5deg);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
-}
-
-/* Focus Styles */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 focus:ring-offset-2 focus:ring-offset-black;
-}
-
-/* Text Selection */
-::selection {
-  background-color: rgba(34, 197, 94, 0.3);
-  color: #ffffff;
-}
-
-::-moz-selection {
-  background-color: rgba(34, 197, 94, 0.3);
-  color: #ffffff;
-}
-
-/* Parallax Effects */
-.parallax {
-  transform-style: preserve-3d;
-}
-
-/* Custom Grid Patterns */
-.grid-pattern {
-  background-image: 
-    radial-gradient(circle at 1px 1px, rgba(34, 197, 94, 0.15) 1px, transparent 0);
-  background-size: 20px 20px;
-}
-
-.dot-pattern {
-  background-image: 
-    radial-gradient(circle, rgba(34, 197, 94, 0.1) 1px, transparent 1px);
-  background-size: 15px 15px;
-}
-
-/* Form Styles */
-.form-input {
-  @apply bg-black/50 border border-gray-600 rounded-lg text-white placeholder-white/40 focus:border-green-400 focus:outline-none focus:ring-1 focus:ring-green-400 transition-colors;
-}
-
-.form-input:focus {
-  box-shadow: 0 0 0 1px #16a34a, 0 0 15px rgba(34, 197, 94, 0.1);
-}
-
-/* Mobile Optimizations */
-@media (max-width: 768px) {
-  .mobile-padding {
-    padding-left: 1rem;
-    padding-right: 1rem;
+/* Components layer - reusable component styles */
+@layer components {
+  /* Glass morphism effects */
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
   }
-  
-  .mobile-text {
-    font-size: clamp(1rem, 4vw, 1.5rem);
+
+  .glass-dark {
+    @apply bg-black/30 backdrop-blur-md border border-white/10;
   }
-  
-  .mobile-heading {
-    font-size: clamp(2rem, 8vw, 4rem);
+
+  /* Gradient text utilities */
+  .gradient-text-green {
+    @apply bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent;
+  }
+
+  .gradient-text-blue {
+    @apply bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent;
+  }
+
+  .gradient-text-purple {
+    @apply bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent;
+  }
+
+  /* Button styles */
+  .btn-glow {
+    @apply relative overflow-hidden;
+  }
+
+  .btn-glow::before {
+    @apply content-[''] absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-all duration-500;
+  }
+
+  .btn-glow:hover::before {
+    @apply left-full;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 animate-pulse;
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+
+  /* Interactive card effects */
+  .interactive-card {
+    @apply transition-all duration-300 transform-gpu;
+    transform-style: preserve-3d;
+  }
+
+  .interactive-card:hover {
+    @apply -translate-y-1 shadow-xl;
+    transform: translateY(-5px) rotateX(5deg);
+  }
+
+  /* Focus ring utility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:ring-offset-2 focus:ring-offset-black;
+  }
+
+  /* Form input styles */
+  .form-input {
+    @apply bg-black/50 border border-gray-600 rounded-lg text-white placeholder:text-white/40 
+           focus:border-green-400 focus:outline-none focus:ring-1 focus:ring-green-400 
+           transition-colors;
+  }
+
+  .form-input:focus {
+    box-shadow: 0 0 0 1px theme('colors.green.600'), 0 0 15px theme('colors.green.500/10');
+  }
+
+  /* Pattern backgrounds */
+  .grid-pattern {
+    background-image: radial-gradient(circle at 1px 1px, rgba(34, 197, 94, 0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+
+  .dot-pattern {
+    background-image: radial-gradient(circle, rgba(34, 197, 94, 0.1) 1px, transparent 1px);
+    background-size: 15px 15px;
+  }
+
+  /* Animation utility classes */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  .animate-slide-in-left {
+    animation: slideInFromLeft 0.6s ease-out forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slideInFromRight 0.6s ease-out forwards;
+  }
+
+  .animate-slide-in-bottom {
+    animation: slideInFromBottom 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out forwards;
   }
 }
 
-/* High contrast mode support */
+/* Utilities layer - utility classes and overrides */
+@layer utilities {
+  /* Screen reader only */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  /* Skip to content link */
+  .skip-link {
+    @apply absolute -top-10 left-2 bg-green-600 text-white px-2 py-2 rounded 
+           transition-all duration-300 z-50 focus:top-2;
+  }
+
+  /* Mobile-first responsive text */
+  .responsive-text-sm {
+    font-size: clamp(0.875rem, 3vw, 1rem);
+  }
+
+  .responsive-text-base {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+  }
+
+  .responsive-text-lg {
+    font-size: clamp(1.125rem, 5vw, 1.5rem);
+  }
+
+  .responsive-text-xl {
+    font-size: clamp(1.25rem, 6vw, 1.875rem);
+  }
+
+  .responsive-text-2xl {
+    font-size: clamp(1.5rem, 7vw, 2.25rem);
+  }
+
+  .responsive-text-3xl {
+    font-size: clamp(1.875rem, 8vw, 3rem);
+  }
+
+  .responsive-text-4xl {
+    font-size: clamp(2.25rem, 10vw, 3.75rem);
+  }
+
+  .responsive-text-5xl {
+    font-size: clamp(3rem, 12vw, 4.5rem);
+  }
+
+  /* Aspect ratio utilities for older browsers */
+  .aspect-video {
+    aspect-ratio: 16 / 9;
+  }
+
+  .aspect-square {
+    aspect-ratio: 1 / 1;
+  }
+
+  /* Z-index management */
+  .z-hero {
+    z-index: 1;
+  }
+
+  .z-navbar {
+    z-index: 50;
+  }
+
+  .z-overlay {
+    z-index: 10;
+  }
+
+  .z-modal {
+    z-index: 100;
+  }
+}
+
+/* Media queries for enhanced accessibility and performance */
 @media (prefers-contrast: high) {
   .glass {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    @apply bg-white/20 border-white/40;
+  }
+  
+  .glass-dark {
+    @apply bg-black/60 border-white/40;
   }
 }
 
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -276,49 +301,62 @@ body {
   }
   
   html {
-    scroll-behavior: auto;
+    @apply scroll-auto;
   }
+  
+  .interactive-card:hover {
+    @apply transform-none;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  /* Add light mode styles if needed in the future */
 }
 
 /* Print styles */
 @media print {
   body {
-    background: white;
-    color: black;
+    @apply bg-white text-black;
   }
   
   .no-print {
-    display: none;
+    @apply hidden;
+  }
+  
+  .glass,
+  .glass-dark {
+    @apply bg-transparent border-gray-300;
   }
 }
 
-/* Accessibility improvements */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .interactive-card:hover {
+    @apply transform-none;
+  }
+  
+  .btn-glow:hover::before {
+    @apply left-0;
+  }
 }
 
-/* Skip to content link */
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 6px;
-  background: #16a34a;
-  color: white;
-  padding: 8px;
-  text-decoration: none;
-  border-radius: 4px;
-  transition: top 0.3s;
-  z-index: 1000;
+/* High resolution display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Ensure crisp rendering on high-DPI displays */
+  .glass,
+  .glass-dark {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
-.skip-link:focus {
-  top: 6px;
+/* Backdrop blur fallback for older browsers */
+@supports not (backdrop-filter: blur(10px)) {
+  .glass {
+    @apply bg-gray-900/80;
+  }
+  
+  .glass-dark {
+    @apply bg-black/80;
+  }
 }

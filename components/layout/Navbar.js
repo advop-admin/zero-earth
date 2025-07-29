@@ -34,10 +34,10 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-navbar transition-all duration-300 shadow-lg ${
         isScrolled
           ? 'bg-black/90 backdrop-blur-md border-b border-white/10'
-          : 'bg-transparent'
+          : 'bg-gradient-to-r from-black/80 via-black/60 to-black/80 backdrop-blur-sm border-b border-white/5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,7 +46,7 @@ const Navbar = () => {
           <div className="flex-shrink-0">
             <Link 
               href="/" 
-              className="text-xl font-bold tracking-tight hover:text-green-400 transition-colors"
+              className="text-xl font-bold tracking-tight text-white hover:text-green-400 transition-colors"
             >
               Zero Earth
             </Link>
@@ -59,7 +59,7 @@ const Navbar = () => {
                 <button
                   key={link.href}
                   onClick={() => scrollToSection(link.href)}
-                  className="text-white/80 hover:text-white px-3 py-2 text-sm font-medium transition-colors hover:bg-white/5 rounded-md"
+                  className="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 rounded-md focus-ring"
                 >
                   {link.label}
                 </button>
@@ -71,7 +71,7 @@ const Navbar = () => {
           <div className="hidden md:block">
             <button
               onClick={() => scrollToSection('#contact')}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all hover:scale-105"
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all hover:scale-105 focus-ring"
             >
               Get Started
             </button>
@@ -81,7 +81,7 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-white hover:text-green-400 p-2"
+              className="text-white hover:text-green-400 p-2 focus-ring bg-white/5 rounded-md hover:bg-white/10 transition-colors"
             >
               <svg
                 className={`h-6 w-6 transition-transform duration-200 ${
@@ -114,20 +114,20 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-black/95 backdrop-blur-md border-t border-white/10">
+        <div className="md:hidden bg-gradient-to-b from-black/95 to-black/90 backdrop-blur-md border-t border-white/10">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navLinks.map((link) => (
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
-                className="text-white/80 hover:text-white block px-3 py-2 text-base font-medium w-full text-left hover:bg-white/5 rounded-md transition-colors"
+                className="text-white/80 hover:text-white block px-3 py-2 text-base font-medium w-full text-left hover:bg-white/5 rounded-md transition-colors focus-ring"
               >
                 {link.label}
               </button>
             ))}
             <button
               onClick={() => scrollToSection('#contact')}
-              className="bg-green-600 hover:bg-green-700 text-white block px-3 py-2 rounded-md text-base font-medium w-full mt-4 transition-colors"
+              className="bg-green-600 hover:bg-green-700 text-white block px-3 py-2 rounded-md text-base font-medium w-full mt-4 transition-colors focus-ring"
             >
               Get Started
             </button>

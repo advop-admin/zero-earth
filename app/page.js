@@ -13,7 +13,7 @@ export default function Home() {
       <HeroSection />
       
       {/* Main Content Sections */}
-      <div className="relative z-10">
+      <div className="relative z-10 bg-black">
         <AboutSection />
         <ProblemSection />
         <SolutionSection />

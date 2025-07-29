@@ -16,7 +16,7 @@ const LogoLattice = dynamic(() => import('../interactive/LogoLattice'), {
 
 const HeroSection = () => {
   return (
-    <section className="min-h-screen bg-black relative">
+    <section className="min-h-screen bg-black relative z-hero pt-16">
       <div className="w-full h-screen relative">
         <LogoLattice
           logoSize={50}
@@ -26,13 +26,21 @@ const HeroSection = () => {
         />
         
         {/* Caption overlay with strong visual hierarchy */}
-        <div className="absolute inset-0 flex items-center pointer-events-none z-10">
-          <div className="ml-12 md:ml-20">
-            <h1 className="text-white text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight">
+        <div className="absolute inset-0 flex items-center pointer-events-none z-overlay">
+          <div className="ml-12 md:ml-20 lg:ml-32 max-w-4xl">
+            <h1 className="text-white text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-tight animate-fade-in">
               | Let every carbon tell a good story
             </h1>
+            <div className="mt-6 md:mt-8 animate-slide-in-bottom">
+              <p className="text-white/80 text-lg md:text-xl lg:text-2xl font-medium max-w-2xl">
+                Transforming carbon accountability through innovative storytelling and transparent tracking
+              </p>
+            </div>
           </div>
         </div>
+
+        {/* Decorative gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent pointer-events-none z-overlay"></div>
       </div>
     </section>
   );
