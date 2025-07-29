@@ -11,8 +11,8 @@ const HeroSection = () => {
     <section className="min-h-screen bg-black relative z-hero pt-16" style={{ overflow: 'visible' }}>
       <div className="w-full min-h-screen md:h-screen relative" style={{ overflow: 'visible' }}>
         <LogoLattice
-          logoSize={30}
-          baseOpacity={0.12}
+          logoSize={44}
+          baseOpacity={0.15}
           hoverOpacity={0.95}
           transitionDuration={0.3}
         />

@@ -177,14 +177,11 @@ const LogoLattice = ({
       // This ensures circles touch exactly at their edges
       const centerDistance = logoDiameter;
       
-      // Slightly reduce spacing to eliminate gaps
-      const spacingMultiplier = 0.98; // 2% tighter spacing
-      
       // For hexagonal packing:
       // Horizontal spacing = centerDistance (circles touch horizontally)
       // Vertical spacing = centerDistance * √3/2 (circles touch diagonally)
-      const horizontalSpacing = centerDistance * spacingMultiplier;
-      const verticalSpacing = centerDistance * Math.sqrt(3) / 2 * spacingMultiplier;
+      const horizontalSpacing = centerDistance;
+      const verticalSpacing = centerDistance * Math.sqrt(3) / 2;
 
       // Calculate grid dimensions with extra padding for seamless tiling
       const cols = Math.ceil((width + horizontalSpacing) / horizontalSpacing) + 10;
