@@ -1,12 +1,22 @@
 {
-  "name": "Zero Earth",
-  "short_name": "Zero Earth",
-  "description": "Let every carbon tell a good story",
+  "name": "ZeroEarth",
+  "short_name": "ZeroEarth",
+  "description": "Decarbonisation Starts with Visibility",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#16a34a",
   "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
     {
       "src": "/assets/logos/logo-colored.png",
       "sizes": "192x192",
