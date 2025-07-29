@@ -31,10 +31,20 @@ const LogoLattice = ({
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Detect touch device
+  // Detect touch device and mobile screen
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Improved image loading with better error handling
@@ -87,8 +97,12 @@ const LogoLattice = ({
         setLoadingError(true);
       });
 
-    // Load background image with cache busting
-    loadImage('/assets/images/farmer-background.jpg?v=1.0.1')
+    // Load background image with cache busting (responsive)
+    const backgroundImagePath = isMobile 
+      ? '/assets/images/farmer-background-mobile.png?v=1.0.1'
+      : '/assets/images/farmer-background.png?v=1.0.1';
+      
+    loadImage(backgroundImagePath)
       .then(img => {
         images[2] = img;
         setBackgroundLoaded(true);
@@ -107,7 +121,7 @@ const LogoLattice = ({
     }
 
     return images;
-  }, [loadImage]);
+  }, [loadImage, isMobile]);
 
   // Create tessellating hexagonal lattice structure
   const buildTessellatingLattice = useCallback(() => {
