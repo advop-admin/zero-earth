@@ -401,7 +401,7 @@ const LogoLattice = ({
     if (!canvas || !isTouchDevice) return;
     
     function onTouchStart(e) {
-      e.preventDefault();
+      // Don't prevent default to allow scrolling
       if (e.touches.length > 0) {
         const touch = e.touches[0];
         throttledInteraction(touch.clientX, touch.clientY);
@@ -409,7 +409,7 @@ const LogoLattice = ({
     }
     
     function onTouchMove(e) {
-      e.preventDefault();
+      // Don't prevent default to allow scrolling
       if (e.touches.length > 0) {
         const touch = e.touches[0];
         throttledInteraction(touch.clientX, touch.clientY);
@@ -417,7 +417,7 @@ const LogoLattice = ({
     }
     
     function onTouchEnd(e) {
-      e.preventDefault();
+      // Don't prevent default to allow scrolling
       // Reset on touch end for mobile
       setTimeout(() => {
         nodesRef.current.forEach((node) => {
@@ -533,7 +533,8 @@ const LogoLattice = ({
         onMouseLeave={handleMouseLeave}
         style={{ 
           cursor: isTouchDevice ? 'default' : 'pointer',
-          touchAction: 'none'
+          touchAction: 'auto',
+          pointerEvents: 'auto'
         }}
         aria-label="Interactive logo lattice background"
         role="img"

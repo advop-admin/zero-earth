@@ -8,8 +8,8 @@ const LogoLattice = dynamic(() => import('../interactive/LogoLattice'), {
 
 const HeroSection = () => {
   return (
-    <section className="min-h-screen bg-black relative z-hero pt-16">
-      <div className="w-full min-h-screen md:h-screen relative">
+    <section className="min-h-screen bg-black relative z-hero pt-16" style={{ overflow: 'visible' }}>
+      <div className="w-full min-h-screen md:h-screen relative" style={{ overflow: 'visible' }}>
         <LogoLattice
           logoSize={50}
           baseOpacity={0.2}
