@@ -167,32 +167,38 @@ const LogoLattice = ({
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      // PERFECT HONEYCOMB GEOMETRY
-      // Each logo should be treated as a circle with radius R
-      // In a perfect honeycomb, circles touch exactly at their edges
-      const circleRadius = logoSize / 2; // Radius of each logo circle
+      // PERFECT HONEYCOMB GEOMETRY - EXACT MATCHING
+      // Each logo is treated as a circle with diameter = logoSize
+      // For perfect honeycomb, circles must touch exactly at their edges
+      const logoDiameter = logoSize;
+      const logoRadius = logoSize / 2;
       
-      // For perfect honeycomb, distance between centers = logoSize (so logos touch exactly)
-      const centerDistance = logoSize;
+      // In a perfect honeycomb, the distance between circle centers = diameter
+      // This ensures circles touch exactly at their edges
+      const centerDistance = logoDiameter;
       
-      // For hexagonal packing, horizontal spacing = centerDistance
-      // Vertical spacing = centerDistance * sin(60°) = centerDistance * √3/2
-      const horizontalSpacing = centerDistance;
-      const verticalSpacing = centerDistance * Math.sqrt(3) / 2;
+      // Slightly reduce spacing to eliminate gaps
+      const spacingMultiplier = 0.98; // 2% tighter spacing
+      
+      // For hexagonal packing:
+      // Horizontal spacing = centerDistance (circles touch horizontally)
+      // Vertical spacing = centerDistance * √3/2 (circles touch diagonally)
+      const horizontalSpacing = centerDistance * spacingMultiplier;
+      const verticalSpacing = centerDistance * Math.sqrt(3) / 2 * spacingMultiplier;
 
       // Calculate grid dimensions with extra padding for seamless tiling
-      const cols = Math.ceil((width + horizontalSpacing) / horizontalSpacing) + 8;
-      const rows = Math.ceil((finalHeight + verticalSpacing) / verticalSpacing) + 8;
+      const cols = Math.ceil((width + horizontalSpacing) / horizontalSpacing) + 10;
+      const rows = Math.ceil((finalHeight + verticalSpacing) / verticalSpacing) + 10;
 
       const nodes = [];
       
       // Create perfect honeycomb grid
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-          // Calculate position with proper hexagonal offset
-          // Start with a slight offset to ensure perfect alignment
-          const x = col * horizontalSpacing + (row % 2) * (horizontalSpacing / 2) + (horizontalSpacing / 2);
-          const y = row * verticalSpacing + (verticalSpacing / 2);
+          // Calculate position with perfect hexagonal offset
+          // Each row is offset by half the horizontal spacing
+          const x = col * horizontalSpacing + (row % 2) * (horizontalSpacing / 2);
+          const y = row * verticalSpacing;
           
           // Only add if within bounds with padding
           if (x >= -logoSize && x <= width + logoSize && y >= -logoSize && y <= finalHeight + logoSize) {
@@ -205,7 +211,8 @@ const LogoLattice = ({
               rotation: 0, // No rotation for perfect honeycomb alignment
               scale: 1.0, // Uniform scale for perfect honeycomb
               originalScale: 1.0,
-              circleRadius,
+              logoDiameter,
+              logoRadius,
             };
             nodes.push(node);
           }
@@ -213,7 +220,7 @@ const LogoLattice = ({
       }
 
       console.log(`Created ${nodes.length} nodes in perfect honeycomb lattice pattern`);
-      console.log(`Circle radius: ${circleRadius}, Center distance: ${centerDistance}`);
+      console.log(`Logo diameter: ${logoDiameter}, Center distance: ${centerDistance}`);
       console.log(`Horizontal spacing: ${horizontalSpacing}, Vertical spacing: ${verticalSpacing}`);
       nodesRef.current = nodes;
       renderLattice();
@@ -278,8 +285,8 @@ const LogoLattice = ({
         ctx.globalAlpha = Math.max(0, Math.min(1, node.opacity));
         
         // Apply transformations with perfect honeycomb positioning
-        const centerX = node.x + node.circleRadius;
-        const centerY = node.y + node.circleRadius;
+        const centerX = node.x + node.logoRadius;
+        const centerY = node.y + node.logoRadius;
         
         ctx.translate(centerX, centerY);
         ctx.rotate((node.rotation * Math.PI) / 180);
@@ -290,7 +297,7 @@ const LogoLattice = ({
         
         // Draw the logo as a perfect circle that touches neighbors
         try {
-          ctx.drawImage(img, -node.circleRadius, -node.circleRadius, logoSize, logoSize);
+          ctx.drawImage(img, -node.logoRadius, -node.logoRadius, logoSize, logoSize);
         } catch (drawError) {
           console.warn('Error drawing logo:', drawError);
         }
@@ -315,8 +322,8 @@ const LogoLattice = ({
 
     nodesRef.current.forEach((node) => {
       const distance = Math.sqrt(
-        Math.pow(x - (node.x + node.circleRadius), 2) +
-        Math.pow(y - (node.y + node.circleRadius), 2)
+        Math.pow(x - (node.x + node.logoRadius), 2) +
+        Math.pow(y - (node.y + node.logoRadius), 2)
       );
 
       const wasHovered = node.isHovered;
