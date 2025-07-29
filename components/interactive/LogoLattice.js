@@ -172,8 +172,8 @@ const LogoLattice = ({
       // In a perfect honeycomb, circles touch exactly at their edges
       const circleRadius = logoSize / 2; // Radius of each logo circle
       
-      // Distance between circle centers = 2 * radius (so circles touch exactly)
-      const centerDistance = logoSize; // This ensures logos touch at their edges
+      // For perfect honeycomb, distance between centers = logoSize (so logos touch exactly)
+      const centerDistance = logoSize;
       
       // For hexagonal packing, horizontal spacing = centerDistance
       // Vertical spacing = centerDistance * sin(60°) = centerDistance * √3/2
@@ -190,8 +190,9 @@ const LogoLattice = ({
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           // Calculate position with proper hexagonal offset
-          const x = col * horizontalSpacing + (row % 2) * (horizontalSpacing / 2);
-          const y = row * verticalSpacing;
+          // Start with a slight offset to ensure perfect alignment
+          const x = col * horizontalSpacing + (row % 2) * (horizontalSpacing / 2) + (horizontalSpacing / 2);
+          const y = row * verticalSpacing + (verticalSpacing / 2);
           
           // Only add if within bounds with padding
           if (x >= -logoSize && x <= width + logoSize && y >= -logoSize && y <= finalHeight + logoSize) {
