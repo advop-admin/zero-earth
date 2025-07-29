@@ -136,7 +136,7 @@ const LogoLattice = ({
     loadBackground();
   }, [loadImage, isMobile]);
 
-  // Create tessellating hexagonal lattice structure
+  // Create perfect honeycomb hexagonal lattice structure
   const buildTessellatingLattice = useCallback(() => {
     const wrap = wrapperRef.current;
     const canvas = canvasRef.current;
@@ -167,23 +167,31 @@ const LogoLattice = ({
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      // Calculate hexagonal grid spacing
-      const hexSize = logoSize * 1.2;
-      const hexWidth = hexSize * Math.sqrt(3);
-      const hexHeight = hexSize * 2;
+      // PERFECT HONEYCOMB GEOMETRY
+      // Each logo should be treated as a circle with radius R
+      // In a perfect honeycomb, circles touch exactly at their edges
+      const circleRadius = logoSize / 2; // Radius of each logo circle
+      
+      // Distance between circle centers = 2 * radius (so circles touch)
+      const centerDistance = circleRadius * 2;
+      
+      // For hexagonal packing, horizontal spacing = centerDistance
+      // Vertical spacing = centerDistance * sin(60°) = centerDistance * √3/2
+      const horizontalSpacing = centerDistance;
+      const verticalSpacing = centerDistance * Math.sqrt(3) / 2;
 
-      // Calculate grid dimensions with padding
-      const cols = Math.ceil((width + hexWidth) / hexWidth) + 2;
-      const rows = Math.ceil((finalHeight + hexHeight) / hexHeight) + 2;
+      // Calculate grid dimensions with extra padding for seamless tiling
+      const cols = Math.ceil((width + horizontalSpacing) / horizontalSpacing) + 8;
+      const rows = Math.ceil((finalHeight + verticalSpacing) / verticalSpacing) + 8;
 
       const nodes = [];
       
-      // Create hexagonal grid of logo nodes
+      // Create perfect honeycomb grid
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-          // Calculate hexagonal position
-          const x = col * hexWidth + (row % 2) * (hexWidth / 2);
-          const y = row * hexHeight * 0.75;
+          // Calculate position with proper hexagonal offset
+          const x = col * horizontalSpacing + (row % 2) * (horizontalSpacing / 2);
+          const y = row * verticalSpacing;
           
           // Only add if within bounds with padding
           if (x >= -logoSize && x <= width + logoSize && y >= -logoSize && y <= finalHeight + logoSize) {
@@ -194,13 +202,18 @@ const LogoLattice = ({
               isHovered: false,
               opacity: baseOpacity,
               rotation: Math.random() * 360,
-              scale: 0.9 + Math.random() * 0.2,
+              scale: 1.0, // Uniform scale for perfect honeycomb
+              originalScale: 1.0,
+              circleRadius,
             };
             nodes.push(node);
           }
         }
       }
 
+      console.log(`Created ${nodes.length} nodes in perfect honeycomb lattice pattern`);
+      console.log(`Circle radius: ${circleRadius}, Center distance: ${centerDistance}`);
+      console.log(`Horizontal spacing: ${horizontalSpacing}, Vertical spacing: ${verticalSpacing}`);
       nodesRef.current = nodes;
       renderLattice();
     } catch (error) {
@@ -256,16 +269,16 @@ const LogoLattice = ({
         console.log('No background image to draw');
       }
 
-      // Batch render logos for better performance
+      // Batch render logos for better performance with honeycomb optimization
       nodesRef.current.forEach((node) => {
         ctx.save();
         
         // Set global alpha
         ctx.globalAlpha = Math.max(0, Math.min(1, node.opacity));
         
-        // Apply transformations
-        const centerX = node.x + logoSize / 2;
-        const centerY = node.y + logoSize / 2;
+        // Apply transformations with perfect honeycomb positioning
+        const centerX = node.x + node.circleRadius;
+        const centerY = node.y + node.circleRadius;
         
         ctx.translate(centerX, centerY);
         ctx.rotate((node.rotation * Math.PI) / 180);
@@ -274,9 +287,9 @@ const LogoLattice = ({
         // Choose logo based on hover state
         const img = node.isHovered ? coloredLogo : monochromeLogo;
         
-        // Draw the logo with error handling
+        // Draw the logo as a perfect circle that touches neighbors
         try {
-          ctx.drawImage(img, -logoSize / 2, -logoSize / 2, logoSize, logoSize);
+          ctx.drawImage(img, -node.circleRadius, -node.circleRadius, logoSize, logoSize);
         } catch (drawError) {
           console.warn('Error drawing logo:', drawError);
         }
@@ -288,21 +301,21 @@ const LogoLattice = ({
     }
   }, [logoSize, isLoaded, backgroundImage, coloredLogo, monochromeLogo]);
 
-  // Improved interaction handler
+  // Improved interaction handler with honeycomb-aware hover detection
   const handleInteraction = useCallback((clientX, clientY) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
     const x = clientX - rect.left;
     const y = clientY - rect.top;
-    const hoverRadius = logoSize * 0.8;
+    const hoverRadius = logoSize * 0.6; // Precise hover radius for honeycomb precision
 
     let hasChanges = false;
 
     nodesRef.current.forEach((node) => {
       const distance = Math.sqrt(
-        Math.pow(x - (node.x + logoSize / 2), 2) +
-        Math.pow(y - (node.y + logoSize / 2), 2)
+        Math.pow(x - (node.x + node.circleRadius), 2) +
+        Math.pow(y - (node.y + node.circleRadius), 2)
       );
 
       const wasHovered = node.isHovered;
@@ -316,9 +329,9 @@ const LogoLattice = ({
           animationRef.current[node.id].kill();
         }
         
-        // Create new animation
+        // Create new animation with honeycomb-optimized effects
         const targetOpacity = node.isHovered ? hoverOpacity : baseOpacity;
-        const targetScale = node.isHovered ? 1.1 : (0.9 + Math.random() * 0.2);
+        const targetScale = node.isHovered ? 1.3 : node.originalScale; // Subtle scale for clean honeycomb effect
         
         const anim = gsap.to(node, {
           opacity: targetOpacity,
@@ -373,7 +386,7 @@ const LogoLattice = ({
           
           const anim = gsap.to(node, {
             opacity: baseOpacity,
-            scale: 0.9 + Math.random() * 0.2,
+            scale: node.originalScale,
             duration: transitionDuration,
             ease: "power2.out",
             onUpdate: renderLattice,
@@ -425,7 +438,7 @@ const LogoLattice = ({
             node.isHovered = false;
             gsap.to(node, {
               opacity: baseOpacity,
-              scale: 0.9 + Math.random() * 0.2,
+              scale: node.originalScale,
               duration: transitionDuration,
               ease: "power2.out",
               onUpdate: renderLattice
