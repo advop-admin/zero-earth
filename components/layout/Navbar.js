@@ -46,9 +46,9 @@ const Navbar = () => {
           <div className="flex-shrink-0">
             <Link 
               href="/" 
-              className="text-xl font-bold tracking-tight text-white hover:text-green-400 transition-colors"
+              className="text-lg sm:text-xl font-bold tracking-tight text-white hover:text-green-400 transition-colors"
             >
-              Zero Earth
+              ZeroEarth
             </Link>
           </div>
 
@@ -82,6 +82,7 @@ const Navbar = () => {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-white hover:text-green-400 p-2 focus-ring bg-white/5 rounded-md hover:bg-white/10 transition-colors"
+              aria-label="Toggle mobile menu"
             >
               <svg
                 className={`h-6 w-6 transition-transform duration-200 ${
@@ -115,22 +116,24 @@ const Navbar = () => {
       {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-gradient-to-b from-black/95 to-black/90 backdrop-blur-md border-t border-white/10">
-          <div className="px-2 pt-2 pb-3 space-y-1">
+          <div className="px-4 pt-2 pb-4 space-y-2">
             {navLinks.map((link) => (
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
-                className="text-white/80 hover:text-white block px-3 py-2 text-base font-medium w-full text-left hover:bg-white/5 rounded-md transition-colors focus-ring"
+                className="text-white/90 hover:text-white block px-3 py-3 text-base font-medium w-full text-left hover:bg-white/5 rounded-md transition-colors focus-ring"
               >
                 {link.label}
               </button>
             ))}
-            <button
-              onClick={() => scrollToSection('#contact')}
-              className="bg-green-600 hover:bg-green-700 text-white block px-3 py-2 rounded-md text-base font-medium w-full mt-4 transition-colors focus-ring"
-            >
-              Get Started
-            </button>
+            <div className="pt-2 border-t border-white/10">
+              <button
+                onClick={() => scrollToSection('#contact')}
+                className="bg-green-600 hover:bg-green-700 text-white block px-3 py-3 rounded-md text-base font-medium w-full transition-colors focus-ring"
+              >
+                Get Started
+              </button>
+            </div>
           </div>
         </div>
       )}
