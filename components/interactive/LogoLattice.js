@@ -28,7 +28,6 @@ const LogoLattice = ({
   const animationRef = useRef(null);
   const isLoadedRef = useRef(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -38,7 +37,9 @@ const LogoLattice = ({
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      console.log('Mobile detection:', mobile, 'Width:', window.innerWidth);
     };
     
     checkMobile();
@@ -55,7 +56,7 @@ const LogoLattice = ({
       
       const timeout = setTimeout(() => {
         reject(new Error(`Image load timeout: ${src}`));
-      }, 10000); // 10 second timeout
+      }, 5000); // 5 second timeout for faster loading
       
       img.onload = () => {
         clearTimeout(timeout);
@@ -71,56 +72,68 @@ const LogoLattice = ({
     });
   }, []);
 
-  // Load all images with proper error handling
-  const [coloredLogo, monochromeLogo, backgroundImage] = useMemo(() => {
-    const images = [null, null, null];
-    
-    // Load colored logo with cache busting
-    loadImage('/assets/logos/logo-colored.png?v=1.0.1')
-      .then(img => {
-        images[0] = img;
-        checkAllLoaded();
-      })
-      .catch(error => {
-        console.error('Error loading colored logo:', error);
-        setLoadingError(true);
-      });
+  // Image state
+  const [coloredLogo, setColoredLogo] = useState(null);
+  const [monochromeLogo, setMonochromeLogo] = useState(null);
+  const [backgroundImage, setBackgroundImage] = useState(null);
 
-    // Load monochrome logo with cache busting
-    loadImage('/assets/logos/logo-monochrome.png?v=1.0.1')
-      .then(img => {
-        images[1] = img;
-        checkAllLoaded();
-      })
-      .catch(error => {
-        console.error('Error loading monochrome logo:', error);
-        setLoadingError(true);
-      });
+  // Load logos only once when component mounts
+  useEffect(() => {
+    const loadLogos = async () => {
+      try {
+        console.log('Loading logos...');
+        
+        const [colored, monochrome] = await Promise.allSettled([
+          loadImage('/assets/logos/logo-colored.png?v=1.0.1'),
+          loadImage('/assets/logos/logo-monochrome.png?v=1.0.1')
+        ]);
 
-    // Load background image with cache busting (responsive)
-    const backgroundImagePath = isMobile 
-      ? '/assets/images/farmer-background-mobile.png?v=1.0.1'
-      : '/assets/images/farmer-background.png?v=1.0.1';
-      
-    loadImage(backgroundImagePath)
-      .then(img => {
-        images[2] = img;
-        setBackgroundLoaded(true);
-        checkAllLoaded();
-      })
-      .catch(error => {
-        console.error('Error loading background image:', error);
-        setBackgroundLoaded(true); // Continue without background
-      });
+        if (colored.status === 'fulfilled') setColoredLogo(colored.value);
+        if (monochrome.status === 'fulfilled') setMonochromeLogo(monochrome.value);
 
-    function checkAllLoaded() {
-      if (images[0] && images[1] && !isLoadedRef.current) {
-        isLoadedRef.current = true;
-        setIsLoaded(true);
+        // Check if logos are loaded
+        if (colored.status === 'fulfilled' && monochrome.status === 'fulfilled' && !isLoadedRef.current) {
+          isLoadedRef.current = true;
+          setIsLoaded(true);
+        }
+
+        // Handle errors
+        if (colored.status === 'rejected') {
+          console.error('Error loading colored logo:', colored.reason);
+          setLoadingError(true);
+        }
+        if (monochrome.status === 'rejected') {
+          console.error('Error loading monochrome logo:', monochrome.reason);
+          setLoadingError(true);
+        }
+      } catch (error) {
+        console.error('Error in logo loading:', error);
       }
-    }
+    };
 
-    return images;
+    loadLogos();
+  }, [loadImage]);
+
+  // Load background image when mobile state changes
+  useEffect(() => {
+    const loadBackground = async () => {
+      try {
+        const backgroundPath = isMobile 
+          ? '/assets/images/farmer-background-mobile.png?v=1.0.1'
+          : '/assets/images/farmer-background.png?v=1.0.1';
+        
+        console.log('Loading background image:', backgroundPath, 'Mobile:', isMobile);
+        
+        const background = await loadImage(backgroundPath);
+        setBackgroundImage(background);
+        console.log('Background image loaded successfully:', backgroundPath);
+      } catch (error) {
+        console.error('Error loading background image:', error);
+        // Continue without background
+      }
+    };
+
+    loadBackground();
   }, [loadImage, isMobile]);
 
   // Create tessellating hexagonal lattice structure
@@ -133,13 +146,19 @@ const LogoLattice = ({
       const { width, height } = wrap.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
 
-      // Ensure canvas dimensions are valid
-      if (width <= 0 || height <= 0) return;
+      console.log('Wrapper dimensions:', width, 'x', height);
+
+      // Ensure canvas dimensions are valid - use minimum height if needed
+      if (width <= 0) return;
+      
+      // Use viewport height if wrapper height is 0
+      const finalHeight = height <= 0 ? window.innerHeight : height;
+      console.log('Final canvas height:', finalHeight);
 
       canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      canvas.height = finalHeight * dpr;
       canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      canvas.style.height = `${finalHeight}px`;
       
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
@@ -155,7 +174,7 @@ const LogoLattice = ({
 
       // Calculate grid dimensions with padding
       const cols = Math.ceil((width + hexWidth) / hexWidth) + 2;
-      const rows = Math.ceil((height + hexHeight) / hexHeight) + 2;
+      const rows = Math.ceil((finalHeight + hexHeight) / hexHeight) + 2;
 
       const nodes = [];
       
@@ -167,7 +186,7 @@ const LogoLattice = ({
           const y = row * hexHeight * 0.75;
           
           // Only add if within bounds with padding
-          if (x >= -logoSize && x <= width + logoSize && y >= -logoSize && y <= height + logoSize) {
+          if (x >= -logoSize && x <= width + logoSize && y >= -logoSize && y <= finalHeight + logoSize) {
             const node = {
               id: `${row}-${col}`,
               x,
@@ -204,7 +223,11 @@ const LogoLattice = ({
       ctx.clearRect(0, 0, width, height);
 
       // Draw background image if loaded
-      if (backgroundLoaded && backgroundImage) {
+      console.log('Rendering lattice - backgroundImage:', backgroundImage ? 'loaded' : 'not loaded');
+      if (backgroundImage) {
+        console.log('Drawing background image - dimensions:', backgroundImage.width, 'x', backgroundImage.height);
+        console.log('Canvas dimensions:', width, 'x', height);
+        
         const imgAspect = backgroundImage.width / backgroundImage.height;
         const canvasAspect = width / height;
         
@@ -222,11 +245,15 @@ const LogoLattice = ({
           drawY = (height - drawHeight) / 2;
         }
         
+        console.log('Drawing background at:', drawX, drawY, drawWidth, 'x', drawHeight);
         ctx.drawImage(backgroundImage, drawX, drawY, drawWidth, drawHeight);
         
         // Add overlay for better contrast
         ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
         ctx.fillRect(0, 0, width, height);
+        console.log('Background image drawn successfully');
+      } else {
+        console.log('No background image to draw');
       }
 
       // Batch render logos for better performance
@@ -259,7 +286,7 @@ const LogoLattice = ({
     } catch (error) {
       console.error('Error rendering lattice:', error);
     }
-  }, [logoSize, isLoaded, backgroundLoaded, backgroundImage, coloredLogo, monochromeLogo]);
+  }, [logoSize, isLoaded, backgroundImage, coloredLogo, monochromeLogo]);
 
   // Improved interaction handler
   const handleInteraction = useCallback((clientX, clientY) => {
@@ -422,6 +449,7 @@ const LogoLattice = ({
   // Initialize and handle resize
   useEffect(() => {
     let resizeTimeout;
+    let initTimeout;
     
     const handleResize = () => {
       clearTimeout(resizeTimeout);
@@ -430,12 +458,27 @@ const LogoLattice = ({
       }, 100); // Debounce resize
     };
 
-    buildTessellatingLattice();
+    // Initial setup with retry
+    const initLattice = () => {
+      buildTessellatingLattice();
+      
+      // Retry after a short delay if canvas height is still 0
+      initTimeout = setTimeout(() => {
+        const canvas = canvasRef.current;
+        if (canvas && canvas.height === 0) {
+          console.log('Canvas height is 0, retrying initialization...');
+          buildTessellatingLattice();
+        }
+      }, 500);
+    };
+
+    initLattice();
     window.addEventListener('resize', handleResize);
     
     return () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(resizeTimeout);
+      clearTimeout(initTimeout);
       
       // Cleanup animations
       if (animationRef.current) {
@@ -447,10 +490,18 @@ const LogoLattice = ({
 
   // Re-render when images load
   useEffect(() => {
-    if (isLoaded && backgroundLoaded) {
+    if (isLoaded) {
       renderLattice();
     }
-  }, [isLoaded, backgroundLoaded, renderLattice]);
+  }, [isLoaded, renderLattice]);
+
+  // Re-render when background image changes
+  useEffect(() => {
+    if (isLoaded && backgroundImage) {
+      console.log('Background image changed, re-rendering...');
+      renderLattice();
+    }
+  }, [backgroundImage, isLoaded, renderLattice]);
 
   // Error state
   if (loadingError) {
@@ -469,11 +520,15 @@ const LogoLattice = ({
     <div
       ref={wrapperRef}
       className={`relative w-full h-full ${className}`}
-      style={style}
+      style={{
+        ...style,
+        minHeight: '100vh',
+        height: '100%'
+      }}
     >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-0 w-full h-full z-10"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{ 
@@ -484,14 +539,7 @@ const LogoLattice = ({
         role="img"
       />
       
-      {(!isLoaded || !backgroundLoaded) && !loadingError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black text-white">
-          <div className="text-center">
-            <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-2"></div>
-            <p className="text-sm">Loading tessellating lattice...</p>
-          </div>
-        </div>
-      )}
+      {/* Removed loading spinner for better performance */}
     </div>
   );
 };

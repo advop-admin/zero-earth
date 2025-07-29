@@ -45,7 +45,6 @@ module.exports = {
         'slide-in-bottom': 'slideInFromBottom 0.6s ease-out forwards',
         'fade-in': 'fadeIn 0.8s ease-out forwards',
         'scale-in': 'scaleIn 0.5s ease-out forwards',
-        'loading': 'loading 1.5s infinite',
       },
       keyframes: {
         float: {
@@ -75,10 +74,6 @@ module.exports = {
         scaleIn: {
           '0%': { transform: 'scale(0.8)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
-        },
-        loading: {
-          '0%': { backgroundPosition: '200% 0' },
-          '100%': { backgroundPosition: '-200% 0' },
         },
       },
       backgroundImage: {
