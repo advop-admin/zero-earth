@@ -4,20 +4,20 @@ const HowItWorksSection = () => {
   const steps = [
     {
       number: "01",
-      title: "Connect Your Data Sources",
-      description: "Integrate with existing systems, IoT sensors, and manual data inputs to create a comprehensive view of your carbon footprint.",
-      features: ["API Integrations", "IoT Sensors", "Manual Upload", "Real-time Sync"],
+      title: "SITA Platform Integration",
+      description: "Connect to our SITA platform for real-time emissions tracking and capacity building across your organization.",
+      features: ["Real-time Monitoring", "Capacity Building", "Data Integration", "Platform Access"],
       icon: (
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
         </svg>
       )
     },
     {
       number: "02",
-      title: "AI-Powered Processing",
-      description: "Our advanced algorithms analyze, validate, and categorize your carbon data with machine learning for maximum accuracy.",
-      features: ["Data Validation", "Anomaly Detection", "Pattern Recognition", "Predictive Analytics"],
+      title: "Research-Driven Solutions",
+      description: "Implement science-backed solutions like seaweed-based feed additives developed with IVRI research and field validation.",
+      features: ["IVRI Research", "Field Validation", "Science-backed", "Pilot Programs"],
       icon: (
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -26,23 +26,23 @@ const HowItWorksSection = () => {
     },
     {
       number: "03",
-      title: "Blockchain Verification",
-      description: "Every data point is cryptographically verified and stored on our secure blockchain for immutable proof of authenticity.",
-      features: ["Cryptographic Proof", "Immutable Records", "Audit Trails", "Third-party Verification"],
+      title: "Stakeholder Engagement",
+      description: "Engage with smallholder farmers, women dairy farmers, and communities through capacity building and sustainability training.",
+      features: ["Capacity Building", "Community Training", "Stakeholder Engagement", "Sustainability Education"],
       icon: (
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       )
     },
     {
       number: "04",
-      title: "Insights & Storytelling",
-      description: "Transform verified data into compelling narratives and actionable insights that drive meaningful environmental impact.",
-      features: ["Interactive Dashboards", "Custom Reports", "Stakeholder Stories", "Impact Visualization"],
+      title: "Verified Impact Generation",
+      description: "Generate verified, traceable offsets through the SITA platform with cryptographic hashing and audit-ready documentation.",
+      features: ["Cryptographic Hashing", "Audit-ready", "Traceable Offsets", "Verified Impact"],
       icon: (
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       )
     }
@@ -54,15 +54,15 @@ const HowItWorksSection = () => {
         {/* Header */}
         <div className="text-center mb-20">
           <div className="inline-flex items-center space-x-2 bg-blue-600/20 backdrop-blur-sm border border-blue-400/30 rounded-full px-4 py-2 text-sm text-blue-400 font-medium mb-6">
-            <span>Process</span>
+            <span>SITA Platform</span>
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
-            How Zero Earth
+            How SITA Platform
             <span className="text-blue-400"> Works</span>
           </h2>
           <p className="max-w-3xl mx-auto text-lg text-white/70 leading-relaxed">
-            Our four-step process transforms raw carbon data into verified, 
-            actionable insights that build trust and drive environmental progress.
+            Our SITA platform combines real-time emissions tracking with capacity building, 
+            enabling verified impact generation across ecosystems and communities.
           </p>
         </div>
 
@@ -134,40 +134,33 @@ const HowItWorksSection = () => {
           ))}
         </div>
 
-        {/* Technology Stack */}
+        {/* SITA Platform Features */}
         <div className="mt-20 pt-16 border-t border-gray-800">
           <div className="text-center mb-12">
-            <h3 className="text-2xl font-bold text-white mb-4">Built on Cutting-Edge Technology</h3>
-            <p className="text-white/60">Powered by industry-leading tools and frameworks</p>
+            <h3 className="text-2xl font-bold text-white mb-4">SITA Platform Capabilities</h3>
+            <p className="text-white/60">Real-time tracking and capacity building features</p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center group">
               <div className="w-16 h-16 bg-gray-800 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-700 transition-colors">
                 <div className="w-8 h-8 bg-green-400 rounded"></div>
               </div>
-              <p className="text-white/60 text-sm">Blockchain</p>
+              <p className="text-white/60 text-sm">Real-time Emissions Tracking</p>
             </div>
             
             <div className="text-center group">
               <div className="w-16 h-16 bg-gray-800 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-700 transition-colors">
                 <div className="w-8 h-8 bg-blue-400 rounded-full"></div>
               </div>
-              <p className="text-white/60 text-sm">AI/ML</p>
+              <p className="text-white/60 text-sm">Capacity Building</p>
             </div>
             
             <div className="text-center group">
               <div className="w-16 h-16 bg-gray-800 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-700 transition-colors">
                 <div className="w-8 h-8 bg-purple-400 rounded-lg"></div>
               </div>
-              <p className="text-white/60 text-sm">IoT</p>
-            </div>
-            
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gray-800 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-700 transition-colors">
-                <div className="w-8 h-8 bg-orange-400 rounded-full"></div>
-              </div>
-              <p className="text-white/60 text-sm">Cloud</p>
+              <p className="text-white/60 text-sm">Verified Impact Generation</p>
             </div>
           </div>
         </div>
@@ -175,16 +168,17 @@ const HowItWorksSection = () => {
         {/* CTA */}
         <div className="text-center mt-16">
           <div className="bg-gradient-to-r from-blue-600/10 to-blue-400/5 rounded-2xl p-8 backdrop-blur-sm border border-blue-400/20">
-            <h3 className="text-2xl font-bold text-white mb-4">Experience the Future of Carbon Accounting</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">Ready to Scale Impact?</h3>
             <p className="text-white/70 mb-8 max-w-2xl mx-auto">
-              See how our proven process can transform your organization's carbon story.
+              Join our pilot programs and experience the power of SITA platform for verified, 
+              traceable emission reductions across India and other LMICs.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
-                onClick={() => document.querySelector('#team')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
                 className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all hover:scale-105 hover:shadow-xl hover:shadow-blue-600/25 flex items-center space-x-2"
               >
-                <span>Meet Our Team</span>
+                <span>Get Started with SITA</span>
                 <svg 
                   className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
                   fill="none" 
@@ -196,10 +190,10 @@ const HowItWorksSection = () => {
               </button>
               
               <button
-                onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => window.open('https://muxo.zeroearth.company', '_blank')}
                 className="group border border-white/30 hover:border-white/60 text-white hover:bg-white/10 px-8 py-4 rounded-lg text-lg font-semibold transition-all backdrop-blur-sm flex items-center space-x-2"
               >
-                <span>Request Demo</span>
+                <span>Explore MUXO Solutions</span>
               </button>
             </div>
           </div>

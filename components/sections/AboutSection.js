@@ -7,16 +7,15 @@ const AboutSection = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <div className="inline-flex items-center space-x-2 bg-green-600/20 backdrop-blur-sm border border-green-400/30 rounded-full px-4 py-2 text-sm text-green-400 font-medium">
-                <span>About Zero Earth</span>
+                <span>About ZeroEarth</span>
               </div>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-                Transforming Carbon 
-                <span className="text-green-400"> Accountability</span>
+                Decarbonisation Starts with 
+                <span className="text-green-400"> Visibility</span>
               </h2>
               <p className="text-lg text-white/70 leading-relaxed">
-                We believe every carbon emission should tell a story of progress, 
-                responsibility, and positive impact. Our platform revolutionizes 
-                how organizations track, verify, and communicate their environmental journey.
+                ZeroEarth creates verifiable climate solutions that reduce emissions at scale — 
+                across ecosystems, enterprises, and economies.
               </p>
             </div>
 
@@ -28,10 +27,10 @@ const AboutSection = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Transparent Tracking</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">DaaS Platform</h3>
                   <p className="text-white/60">
-                    Real-time monitoring of carbon emissions with blockchain-verified authenticity 
-                    and complete audit trails.
+                    Decarbonisation-As-A-Service platform that simplifies, quantifies and digitises 
+                    emission reductions, ensuring accountability while scaling impact.
                   </p>
                 </div>
               </div>
@@ -43,10 +42,10 @@ const AboutSection = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Smart Insights</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">Science & Technology</h3>
                   <p className="text-white/60">
-                    AI-powered analytics that turn raw data into actionable insights 
-                    for sustainable decision-making.
+                    Operating at the intersection of science, technology & financial innovation, 
+                    transforming emission reduction into simplified, digitised & accountable processes.
                   </p>
                 </div>
               </div>
@@ -58,10 +57,10 @@ const AboutSection = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Stakeholder Engagement</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">Ecosystem Connection</h3>
                   <p className="text-white/60">
-                    Connect with partners, investors, and communities through 
-                    compelling sustainability narratives.
+                    Emitters, mitigators & investors intersect on our proprietary platform, 
+                    providing streamlined complex climate problems into actionable solutions.
                   </p>
                 </div>
               </div>
@@ -73,24 +72,27 @@ const AboutSection = () => {
             <div className="glass rounded-2xl p-8">
               <div className="space-y-6">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-green-400 mb-2">2019</div>
-                  <p className="text-white/60">Founded with a vision</p>
+                  <div className="text-4xl font-bold text-green-400 mb-2">Our Achievements</div>
+                  <p className="text-white/60">Recognized for innovation</p>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div className="text-center p-4 bg-white/5 rounded-lg backdrop-blur-sm">
-                    <div className="text-2xl font-bold text-white mb-1">500+</div>
-                    <p className="text-white/60 text-sm">Organizations</p>
+                    <div className="text-lg font-bold text-white mb-1">Winner</div>
+                    <p className="text-white/60 text-sm">Startup India Seed Fund T-Hub</p>
                   </div>
                   <div className="text-center p-4 bg-white/5 rounded-lg backdrop-blur-sm">
-                    <div className="text-2xl font-bold text-white mb-1">50M+</div>
-                    <p className="text-white/60 text-sm">Tons CO₂ Tracked</p>
+                    <div className="text-lg font-bold text-white mb-1">Winner</div>
+                    <p className="text-white/60 text-sm">Climate Catalytic Seed Fund</p>
                   </div>
-                </div>
-
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-green-400 mb-2">45</div>
-                  <p className="text-white/60">Countries worldwide</p>
+                  <div className="text-center p-4 bg-white/5 rounded-lg backdrop-blur-sm">
+                    <div className="text-lg font-bold text-white mb-1">Winner</div>
+                    <p className="text-white/60 text-sm">AgriTech4Uzbekistan 2023</p>
+                  </div>
+                  <div className="text-center p-4 bg-white/5 rounded-lg backdrop-blur-sm">
+                    <div className="text-lg font-bold text-white mb-1">Idea Grant</div>
+                    <p className="text-white/60 text-sm">KSUM</p>
+                  </div>
                 </div>
               </div>
             </div>
