@@ -1,0 +1,21 @@
+{
+  "name": "Zero Earth",
+  "short_name": "Zero Earth",
+  "description": "Let every carbon tell a good story",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "/assets/logos/logo-colored.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/logos/logo-colored.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+} 
