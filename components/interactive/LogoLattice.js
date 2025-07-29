@@ -65,8 +65,8 @@ const LogoLattice = ({
   const [coloredLogo, monochromeLogo, backgroundImage] = useMemo(() => {
     const images = [null, null, null];
     
-    // Load colored logo
-    loadImage('/assets/logos/logo-colored.png')
+    // Load colored logo with cache busting
+    loadImage('/assets/logos/logo-colored.png?v=1.0.1')
       .then(img => {
         images[0] = img;
         checkAllLoaded();
@@ -76,8 +76,8 @@ const LogoLattice = ({
         setLoadingError(true);
       });
 
-    // Load monochrome logo
-    loadImage('/assets/logos/logo-monochrome.png')
+    // Load monochrome logo with cache busting
+    loadImage('/assets/logos/logo-monochrome.png?v=1.0.1')
       .then(img => {
         images[1] = img;
         checkAllLoaded();
@@ -87,8 +87,8 @@ const LogoLattice = ({
         setLoadingError(true);
       });
 
-    // Load background image
-    loadImage('/assets/images/farmer-background.jpg')
+    // Load background image with cache busting
+    loadImage('/assets/images/farmer-background.jpg?v=1.0.1')
       .then(img => {
         images[2] = img;
         setBackgroundLoaded(true);
