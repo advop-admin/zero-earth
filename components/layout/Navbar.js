@@ -46,9 +46,13 @@ const Navbar = () => {
           <div className="flex-shrink-0">
             <Link 
               href="/" 
-              className="text-lg sm:text-xl font-bold tracking-tight text-white hover:text-green-400 transition-colors"
+              className="flex items-center hover:opacity-80 transition-opacity"
             >
-              ZeroEarth
+              <img 
+                src="/assets/logos/logo-header.png" 
+                alt="ZeroEarth" 
+                className="h-8 sm:h-10 w-auto"
+              />
             </Link>
           </div>
 
