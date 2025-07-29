@@ -84,8 +84,8 @@ const LogoLattice = ({
         console.log('Loading logos...');
         
         const [colored, monochrome] = await Promise.allSettled([
-          loadImage('/assets/logos/logo-colored.png?v=1.0.1'),
-          loadImage('/assets/logos/logo-monochrome.png?v=1.0.1')
+          loadImage('/assets/logos/logo-colored.png?v=2.0.0'),
+          loadImage('/assets/logos/logo-monochrome.png?v=2.0.0')
         ]);
 
         if (colored.status === 'fulfilled') setColoredLogo(colored.value);
@@ -172,8 +172,8 @@ const LogoLattice = ({
       // In a perfect honeycomb, circles touch exactly at their edges
       const circleRadius = logoSize / 2; // Radius of each logo circle
       
-      // Distance between circle centers = 2 * radius (so circles touch)
-      const centerDistance = circleRadius * 2;
+      // Distance between circle centers = 2 * radius (so circles touch exactly)
+      const centerDistance = logoSize; // This ensures logos touch at their edges
       
       // For hexagonal packing, horizontal spacing = centerDistance
       // Vertical spacing = centerDistance * sin(60°) = centerDistance * √3/2
@@ -201,7 +201,7 @@ const LogoLattice = ({
               y,
               isHovered: false,
               opacity: baseOpacity,
-              rotation: Math.random() * 360,
+              rotation: 0, // No rotation for perfect honeycomb alignment
               scale: 1.0, // Uniform scale for perfect honeycomb
               originalScale: 1.0,
               circleRadius,
