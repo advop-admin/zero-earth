@@ -27,13 +27,13 @@ const HeroSection = () => {
         
         {/* Caption overlay with strong visual hierarchy */}
         <div className="absolute inset-0 flex items-center pointer-events-none z-overlay">
-          <div className="ml-12 md:ml-20 lg:ml-32 max-w-4xl">
-            <h1 className="text-white text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-tight animate-fade-in">
+          <div className="ml-12 md:ml-20 lg:ml-32">
+            <h1 className="text-white text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-normal tracking-tight leading-tight animate-fade-in whitespace-nowrap">
               | Let every carbon tell a good story
             </h1>
             <div className="mt-6 md:mt-8 animate-slide-in-bottom">
               <p className="text-white/80 text-lg md:text-xl lg:text-2xl font-medium max-w-2xl">
-                Transforming carbon accountability through innovative storytelling and transparent tracking
+              ZeroEarth creates verifiable climate solutions that reduce emissions at scale — across ecosystems, enterprises, and economies.
               </p>
             </div>
           </div>
