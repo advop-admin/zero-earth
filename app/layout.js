@@ -19,10 +19,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        <link rel="icon" type="image/png" sizes="32x32" href="/assets/logos/logo-colored.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/assets/logos/logo-colored.png" />
-        <link rel="apple-touch-icon" href="/assets/logos/logo-colored.png" />
-        <link rel="shortcut icon" href="/assets/logos/logo-colored.png" />
         <meta name="theme-color" content="#16a34a" />
       </head>
       <body className="bg-black text-white antialiased">
